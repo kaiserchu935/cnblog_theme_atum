@@ -1,0 +1,77 @@
+#include <stdio.h>  
+　　#include <stdlib.h>  
+　　#define maxint 1073741824  
+　　int main()  
+　　{  
+　　FILE *input=fopen("input.txt","r"),*out=fopen("output.txt","w");  
+　　int n,m,i,j,x,y,w;  
+　　fscanf(input,"%d %d",&n,&m);  
+　　int map[n][n],E[m][3],tree[m],Mst[n][n];  
+　　/*Mst表示最小生成树的邻接矩阵，map是原图，E是边集，其中E[0]和E[1]是边的两个顶点，E[2]是边的权值，tree是用于判断原图的点是否在最小生成树中*/  
+　　memset(tree,0,sizeof(tree));  
+　　for(i=0; i<n; i++)  
+　　{  
+　　for(j=0; j<n; j++)  
+　　{  
+　　map[i][j]=maxint;  
+　　Mst[i][j]=maxint;  
+　　}  
+　　E[i][0]=E[i][1]=maxint;  
+　　}  
+　　for(i=0; i<m; i++)  
+　　{  
+　　fscanf(input,"%d %d %d",&x,&y,&w);  
+　　if(w<map[x][y])  
+　　{  
+　　map[x][y]=w;  
+　　map[y][x]=w;  
+　　}  
+　　}  
+　　int min=maxint,next=0,now=0,k=0;  
+　　tree[0]=1;  
+　　for(i=0; i<n; i++)  
+　　{  
+　　for(j=0; j<n; j++)  
+　　{  
+　　if(map[now][j]!=maxint && tree[j]==0)  
+　　{  
+　　E[k][0]=now;  
+　　E[k][2]=map[now][j];  
+　　E[k++][1]=j;  
+　　}  
+　　}  
+　　for(j=0; j<k; j++)  
+　　{  
+　　if(E[j][2]<min && tree[E[j][1]]==0)  
+　　{  
+　　min=E[j][2];  
+　　x=E[j][0];  
+　　y=E[j][1];  
+　　next=y;  
+　　}  
+　　}  
+　　tree[next]=1;  
+　　now=next;  
+　　Mst[x][y]=map[x][y];  
+　　Mst[y][x]=map[y][x];  
+　　min=maxint;  
+　　}  
+　　for(i=0; i<n; i++)  
+　　{  
+　　for(j=0; j<n; j++)  
+　　{  
+　　if(Mst[i][j]==maxint) //判断两点是否连通  
+　　fprintf(out,"00 "); //美化输出，不必多加探究  
+　　else  
+　　{  
+　　fprintf(out,"%d ",Mst[i][j]); //输出生成树的邻接矩阵，要输出树的自己可以根据邻接矩阵的数据进行加工  
+　　}  
+　　}  
+　　fprintf(out,"\n");  
+　　}  
+　　fclose(input);  
+　　fclose(out);  
+　　return 0;  
+　　} // 程序未考虑不是连通图的情况，修改很简单，判断生成树的节点数量是否等于原图的节点数量  
+　　//如果小于（不会有大于）则本图不是连通图  
+　　//其实prim和迪杰斯特拉算法核心有相似之处
